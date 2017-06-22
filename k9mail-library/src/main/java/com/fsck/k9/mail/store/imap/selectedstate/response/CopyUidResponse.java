@@ -1,4 +1,4 @@
-package com.fsck.k9.mail.store.imap.response;
+package com.fsck.k9.mail.store.imap.selectedstate.response;
 
 
 import java.util.HashMap;
@@ -9,25 +9,24 @@ import com.fsck.k9.mail.store.imap.ImapList;
 import com.fsck.k9.mail.store.imap.ImapResponse;
 import com.fsck.k9.mail.store.imap.ImapUtility;
 import com.fsck.k9.mail.store.imap.Responses;
-import com.fsck.k9.mail.store.imap.command.ImapCommandFactory;
 
 import static com.fsck.k9.mail.store.imap.ImapResponseParser.equalsIgnoreCase;
 import static com.fsck.k9.mail.store.imap.ImapUtility.getImapSequenceValues;
 
 
-public class CopyUidResponse extends BaseResponse {
+public class CopyUidResponse extends SelectedStateResponse {
 
     private Map<String, String> uidMapping;
 
-    private CopyUidResponse(ImapCommandFactory commandFactory, List<ImapResponse> imapResponse) {
-        super(commandFactory, imapResponse);
+    private CopyUidResponse(List<ImapResponse> imapResponse) {
+        super(imapResponse);
     }
 
-    public static CopyUidResponse parse(ImapCommandFactory commandFactory, List<List<ImapResponse>> imapResponses) {
+    public static CopyUidResponse parse(List<List<ImapResponse>> imapResponses) {
 
         CopyUidResponse combinedResponse = null;
         for (List<ImapResponse> imapResponse : imapResponses) {
-            CopyUidResponse copyUidResponse = new CopyUidResponse(commandFactory, imapResponse);
+            CopyUidResponse copyUidResponse = new CopyUidResponse(imapResponse);
             if (combinedResponse == null) {
                 combinedResponse = copyUidResponse;
             } else {
@@ -71,15 +70,13 @@ public class CopyUidResponse extends BaseResponse {
     }
 
     @Override
-    void combine(BaseResponse baseResponse) {
-        if (baseResponse == null) {
+    void combine(SelectedStateResponse selectedStateResponse) {
+        if (selectedStateResponse == null) {
             return;
         }
-        super.combine(baseResponse);
-        CopyUidResponse copyUidResponse = (CopyUidResponse) baseResponse;
+        CopyUidResponse copyUidResponse = (CopyUidResponse) selectedStateResponse;
         this.uidMapping.putAll(copyUidResponse.getUidMapping());
     }
-
 
     public Map<String, String> getUidMapping() {
         return uidMapping;
